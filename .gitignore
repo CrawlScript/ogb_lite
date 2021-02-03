@@ -25,6 +25,12 @@ dataset/
 **/checkpoint
 **/events.out.*
 
+**/__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+
+
 /test/
 /dataset/
 /.idea/
