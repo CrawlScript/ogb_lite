@@ -1,0 +1,3 @@
+include ogb_lite/graphproppred/master.csv
+include ogb_lite/nodeproppred/master.csv
+include ogb_lite/linkproppred/master.csv
