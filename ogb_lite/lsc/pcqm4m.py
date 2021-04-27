@@ -20,10 +20,12 @@ class PyGPCQM4MDataset(InMemoryDataset):
         self.folder = osp.join(root, 'pcqm4m')
         self.download_name = 'pcqm4m-folder'
         self.version = 1
-        self.url = f'http://ogb-data.stanford.edu/data/lsc/{self.download_name}.zip'
+        # self.url = f'http://ogb-data.stanford.edu/data/lsc/{self.download_name}.zip'
+        self.url = 'http://ogb-data.stanford.edu/data/lsc/{}.zip'.format(self.download_name)
 
         # check version and update if necessary
-        if osp.isdir(self.folder) and (not osp.exists(osp.join(self.folder, f'RELEASE_v{self.version}.txt'))):
+        # if osp.isdir(self.folder) and (not osp.exists(osp.join(self.folder, f'RELEASE_v{self.version}.txt'))):
+        if osp.isdir(self.folder) and (not osp.exists(osp.join(self.folder, 'RELEASE_v{}.txt'.format(self.version)))):
             print('PCQM4M dataset has been updated.')
             if input('Will you update the dataset now? (y/N)\n').lower() == 'y':
                 shutil.rmtree(self.folder)

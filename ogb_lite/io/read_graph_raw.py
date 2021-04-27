@@ -190,7 +190,8 @@ def read_binary_graph_raw(raw_dir, add_inverse_edge = False):
         elif key[:5] == 'edge_':
             edge_dict[key] = data_dict[key]
         else:
-            raise RuntimeError(f"Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{key}\'.")
+            # raise RuntimeError(f"Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{key}\'.")
+            raise RuntimeError("Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{}\'.".format(key))
 
     graph_list = []
     num_nodes_accum = 0
@@ -548,7 +549,8 @@ def read_binary_heterograph_raw(raw_dir, add_inverse_edge = False):
             del tmp
             edge_feat_dict_dict[feat_name] = feat_dict
         else:
-            raise RuntimeError(f"Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{feat_name}\'.")
+            # raise RuntimeError(f"Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{feat_name}\'.")
+            raise RuntimeError("Keys in graph object should start from either \'node_\' or \'edge_\', but found \'{}\'.".format(feat_name))
 
     graph_list = []
     num_nodes_accum_dict = {ent_type: 0 for ent_type in ent_type_list}

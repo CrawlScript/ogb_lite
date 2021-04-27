@@ -42,7 +42,8 @@ class DatasetSaver(object):
             raise NotImplementedError('Heterogeneous graph dataset object has not been implemented for graph property prediction yet.')
 
         if osp.exists(self.dataset_dir):
-            if input(f'Found an existing submission directory at {self.submission_dir}/. \nWill you remove it? (y/N)\n').lower() == 'y':
+            # if input(f'Found an existing submission directory at {self.submission_dir}/. \nWill you remove it? (y/N)\n').lower() == 'y':
+            if input('Found an existing submission directory at {}/. \nWill you remove it? (y/N)\n'.format(self.submission_dir)).lower() == 'y':
                 shutil.rmtree(self.submission_dir)
                 print('Removed existing submission directory')
             else:
@@ -56,8 +57,10 @@ class DatasetSaver(object):
         os.makedirs(osp.join(self.dataset_dir, 'processed'), exist_ok=True)
 
         # create release note
-        with open(osp.join(self.dataset_dir, f'RELEASE_v{version}.txt'), 'w') as fw:
-            fw.write(f'# Release note for {self.dataset_name}\n\n### v{version}: {date.today()}')
+        # with open(osp.join(self.dataset_dir, f'RELEASE_v{version}.txt'), 'w') as fw:
+        with open(osp.join(self.dataset_dir, 'RELEASE_v{}.txt'.format(version)), 'w') as fw:
+            # fw.write(f'# Release note for {self.dataset_name}\n\n### v{version}: {date.today()}')
+            fw.write('# Release note for {}\n\n### v{}: {}'.format(self.dataset_name, version, date.today()))
 
         # check list
         self._save_graph_list_done = False
@@ -136,7 +139,8 @@ class DatasetSaver(object):
             if graph_list[0][key] is None:
                 continue
 
-            print(f'Saving {key}')
+            # print(f'Saving {key}')
+            print('Saving {}'.format(key))
 
             feat_dict = {}
 
@@ -144,12 +148,14 @@ class DatasetSaver(object):
                 # node feature dictionary
                 for ent_type in graph_list[0][key].keys():
                     if ent_type not in num_nodes_dict:
-                        raise RuntimeError(f'Encountered unknown entity type called {ent_type}.')
+                        # raise RuntimeError(f'Encountered unknown entity type called {ent_type}.')
+                        raise RuntimeError('Encountered unknown entity type called {}.'.format(ent_type))
                     
                     # check num_nodes
                     for i in range(len(graph_list)):
                         if len(graph_list[i][key][ent_type]) != num_nodes_dict[ent_type][i]:
-                            raise RuntimeError(f'num_nodes mistmatches with {key}[{ent_type}]')
+                            # raise RuntimeError(f'num_nodes mistmatches with {key}[{ent_type}]')
+                            raise RuntimeError('num_nodes mistmatches with {}[{}]'.format(key, ent_type))
                     
                     # make sure saved in np.int64 or np.float32
                     dtype = np.int64 if 'int' in str(graph_list[0][key][ent_type].dtype) else np.float32
@@ -162,12 +168,14 @@ class DatasetSaver(object):
                     # representing triplet (head, rel, tail) as a single string 'head___rel___tail'
                     triplet_cat = '___'.join(triplet)
                     if triplet_cat not in num_edges_dict:
-                        raise RuntimeError(f"Encountered unknown triplet type called ({','.join(triplet)}).")
+                        # raise RuntimeError(f"Encountered unknown triplet type called ({','.join(triplet)}).")
+                        raise RuntimeError("Encountered unknown triplet type called ({}).".format(','.join(triplet)))
 
                     # check num_edges
                     for i in range(len(graph_list)):
                         if len(graph_list[i][key][triplet]) != num_edges_dict[triplet_cat][i]:
-                            raise RuntimeError(f"num_edges mismatches with {key}[({','.join(triplet)})]")
+                            # raise RuntimeError(f"num_edges mismatches with {key}[({','.join(triplet)})]")
+                            raise RuntimeError("num_edges mismatches with {}[({})]".format(key, ','.join(triplet)))
 
                     # make sure saved in np.int64 or np.float32
                     dtype = np.int64 if 'int' in str(graph_list[0][key][triplet].dtype) else np.float32
@@ -175,9 +183,11 @@ class DatasetSaver(object):
                     feat_dict[triplet_cat] = cat_feat
 
             else:
-                raise RuntimeError(f'Keys in graph object should start from either \'node_\' or \'edge_\', but \'{key}\' given.')
+                # raise RuntimeError(f'Keys in graph object should start from either \'node_\' or \'edge_\', but \'{key}\' given.')
+                raise RuntimeError('Keys in graph object should start from either \'node_\' or \'edge_\', but \'{}\' given.'.format(key))
 
-            np.savez_compressed(osp.join(self.raw_dir, f'{key}.npz'), **feat_dict)
+            # np.savez_compressed(osp.join(self.raw_dir, f'{key}.npz'), **feat_dict)
+            np.savez_compressed(osp.join(self.raw_dir, '{}.npz'.format(key)), **feat_dict)
 
         print('Validating...')
         # testing
@@ -242,7 +252,8 @@ class DatasetSaver(object):
                 # check num_nodes
                 for i in range(len(graph_list)):
                     if len(graph_list[i][key]) != num_nodes_list[i]:
-                        raise RuntimeError(f'num_nodes mistmatches with {key}')
+                        # raise RuntimeError(f'num_nodes mistmatches with {key}')
+                        raise RuntimeError('num_nodes mistmatches with {}'.format(key))
 
                 cat_feat = np.concatenate([graph[key] for graph in graph_list], axis = 0).astype(dtype)
                 data_dict[key] = cat_feat
@@ -253,13 +264,15 @@ class DatasetSaver(object):
                 # check num_edges
                 for i in range(len(graph_list)):
                     if len(graph_list[i][key]) != num_edges_list[i]:
-                        raise RuntimeError(f'num_edges mistmatches with {key}')
+                        # raise RuntimeError(f'num_edges mistmatches with {key}')
+                        raise RuntimeError('num_edges mistmatches with {}'.format(key))
 
                 cat_feat = np.concatenate([graph[key] for graph in graph_list], axis = 0).astype(dtype)
                 data_dict[key] = cat_feat
 
             else:
-                raise RuntimeError(f'Keys in graph object should start from either \'node_\' or \'edge_\', but \'{key}\' given.')
+                # raise RuntimeError(f'Keys in graph object should start from either \'node_\' or \'edge_\', but \'{key}\' given.')
+                raise RuntimeError('Keys in graph object should start from either \'node_\' or \'edge_\', but \'{}\' given.'.format(key))
 
         print('Saving all the files!')
         np.savez_compressed(osp.join(self.raw_dir, 'data.npz'), **data_dict)
@@ -289,7 +302,8 @@ class DatasetSaver(object):
 
         if self.dataset_prefix == 'ogbn' or self.dataset_prefix == 'ogbg':
             if not ('classification' in task_type or 'regression' in task_type):
-                raise ValueError(f'task type must contain eighther classification or regression, but {task_type} given')
+                # raise ValueError(f'task type must contain eighther classification or regression, but {task_type} given')
+                raise ValueError('task type must contain eighther classification or regression, but {} given'.format(task_type))
 
         self.task_type = task_type
 
@@ -298,7 +312,8 @@ class DatasetSaver(object):
         
         if 'classification' in self.task_type:
             if not (isinstance(num_classes, int) and num_classes > 1):
-                raise ValueError(f'num_classes must be an integer larger than 1, {num_classes} given.')
+                # raise ValueError(f'num_classes must be an integer larger than 1, {num_classes} given.')
+                raise ValueError('num_classes must be an integer larger than 1, {} given.'.format(num_classes))
             self.num_classes = num_classes
         else:
             self.num_classes = -1 # in the case of regression, just set to -1
@@ -320,15 +335,18 @@ class DatasetSaver(object):
 
         if self.is_hetero:
             if not (isinstance(target_labels, dict) and len(target_labels) == 1):
-                raise ValueError(f'target label must be of dictionary type with single key')
+                # raise ValueError(f'target label must be of dictionary type with single key')
+                raise ValueError('target label must be of dictionary type with single key')
 
             key = list(target_labels.keys())[0]
             
             if key not in self.num_data:
-                raise ValueError(f'Unknown entity type called {key}.')
+                # raise ValueError(f'Unknown entity type called {key}.')
+                raise ValueError('Unknown entity type called {}.'.format(key))
 
             if len(target_labels[key]) != self.num_data[key]:
-                raise RuntimeError(f'The length of target_labels ({len(target_labels[key])}) must be the same as the number of data points ({self.num_data[key]}).')
+                # raise RuntimeError(f'The length of target_labels ({len(target_labels[key])}) must be the same as the number of data points ({self.num_data[key]}).')
+                raise RuntimeError('The length of target_labels ({}) must be the same as the number of data points ({}).'.format(len(target_labels[key]), self.num_data[key]))
 
             if self.dataset_prefix == 'ogbg':
                 raise NotImplementedError('hetero graph for graph-level prediction has not been implemented yet.')
@@ -341,10 +359,12 @@ class DatasetSaver(object):
         else:
             # check type and shape
             if not isinstance(target_labels, np.ndarray):
-                raise ValueError(f'target label must be of type np.ndarray')
+                # raise ValueError(f'target label must be of type np.ndarray')
+                raise ValueError('target label must be of type np.ndarray')
 
             if len(target_labels) != self.num_data:
-                raise RuntimeError(f'The length of target_labels ({len(target_labels)}) must be the same as the number of data points ({self.num_data}).')
+                # raise RuntimeError(f'The length of target_labels ({len(target_labels)}) must be the same as the number of data points ({self.num_data}).')
+                raise RuntimeError('The length of target_labels ({}) must be the same as the number of data points ({}).'.format(len(target_labels), self.num_data))
 
             if self.dataset_prefix == 'ogbg':
                 np.savez_compressed(osp.join(self.raw_dir, 'graph-label.npz'), graph_label = target_labels)
@@ -421,7 +441,8 @@ class DatasetSaver(object):
         os.makedirs(target_mapping_dir, exist_ok=True)
         file_list = [f for f in os.listdir(mapping_dir) if osp.isfile(osp.join(mapping_dir, f))]
         if 'README.md' not in file_list:
-            raise RuntimeError(f'README.md must be included in mapping_dir {mapping_dir}')
+            # raise RuntimeError(f'README.md must be included in mapping_dir {mapping_dir}')
+            raise RuntimeError('README.md must be included in mapping_dir {}'.format(mapping_dir))
 
         # copy all the files in the mapping_dir to 
         for f in file_list:
@@ -463,7 +484,8 @@ class DatasetSaver(object):
         meta_dict['download_name'] = self.dataset_suffix
         
         map_dict = {'ogbg': 'graphproppred', 'ogbn': 'nodeproppred', 'ogbl': 'linkproppred'}
-        meta_dict['url'] = f'https://snap.stanford.edu/ogb/data/{map_dict[self.dataset_prefix]}/' + meta_dict['download_name'] + '.zip'
+        # meta_dict['url'] = f'https://snap.stanford.edu/ogb/data/{map_dict[self.dataset_prefix]}/' + meta_dict['download_name'] + '.zip'
+        meta_dict['url'] = 'https://snap.stanford.edu/ogb/data/{}/'.format(map_dict[self.dataset_prefix]) + meta_dict['download_name'] + '.zip'
         meta_dict['add_inverse_edge'] = 'False'
         meta_dict['has_node_attr'] = str(self.has_node_attr)
         meta_dict['has_edge_attr'] = str(self.has_node_attr)
@@ -597,7 +619,8 @@ def test_datasetsaver():
     # second argument must be the name of the split
     saver.save_split(split_idx, dataset.meta_info['split'])
     # copying mapping dir
-    saver.copy_mapping_dir(f"dataset/{'_'.join(dataset_name.split('-'))}/mapping/")
+    # saver.copy_mapping_dir(f"dataset/{'_'.join(dataset_name.split('-'))}/mapping/")
+    saver.copy_mapping_dir("dataset/{}/mapping/".format('_'.join(dataset_name.split('-'))))
 
     saver.save_task_info(dataset.task_type, dataset.eval_metric, dataset.num_classes if hasattr(dataset, 'num_classes') else None)
 

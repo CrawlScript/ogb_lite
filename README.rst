@@ -78,7 +78,7 @@ Citing OGB
 
 If you use OGB datasets in your work, please cite the OGB paper (Bibtex below).
 
-.. code-block::
+.. code-block:: HTML
 
    @article{hu2020ogb,
      title={Open Graph Benchmark: Datasets for Machine Learning on Graphs},
